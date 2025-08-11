@@ -16,8 +16,6 @@ Data collection started on July 21 2025 and is currently ongoing.
 ## Work in Development
 This `main` branch contains completed releases for this project. For all work-in-progress, please switch over to the `dev` branches.
 
-:point_right: Keep the "Work in Development" text above as the default NDCLab "blurb" to help visitors navigate the repo. But delete this note before publishing the readme file.
-
 
 ## Contributors
 | Role | Name |
