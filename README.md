@@ -1,15 +1,16 @@
-# [project name]
+# SocCEr - Social Factors and Task Performance
 
 ## Project Goal
-Replace this text with a pithy description of the goal of the data collection project.
+Investigate how social presence impacts error confidence and error monitoring under high uncertainty using EEG and behavioral measures in a target-masking paradigm.
 
 
 ## Background & Design
-Replace this text with a slightly longer (but still only max 250 words) description of the project background and its design. 
+This study uses a modified target-masking paradigm to examine how social observation affects error awareness and confidence ratings. Participants perform a flanker task under two visibility conditions (visible/invisible targets) and two social conditions (observed/alone), while EEG is recorded. The primary focus is on error-related negativity (Ne/ERN), error positivity (Pe), and trial-by-trial confidence ratings. The study employs a within-subjects design with 36 participants completing 864 trials each across social and non-social conditions.
 
 
 ## Roadmap
-:point_right: Details of each data release should be documented in this readme. 
+The preregistration has been registered on OSF on July 21 2025, and is embargoed until publication of the project. After publication of the project, all data and code will also be made publicly available. 
+Data collection started on July 21 2025 and is currently ongoing. 
 
 
 ## Work in Development
@@ -21,13 +22,12 @@ This `main` branch contains completed releases for this project. For all work-in
 ## Contributors
 | Role | Name |
 | ---  | ---  |
-| add role | insert team member(s) |
-| add role | insert team member(s) |
-| add role | insert team member(s) |
+| Project Lead | Marlene Buch, KU Eichstätt-Ingolstadt |
+| Principal Investigator | Dr. George Buzzell, NDCLab FIU Miami |
+| Faculty Collaborator | Prof. Dr. Marco Steinhauser, KU Eichstätt-Ingolstadt |
+| Research Collaborator | Felix Zakirov, NDCLab FIU Miami |
 
 Learn more about us [here](https://www.ndclab.com/people).
 
 ## Contributing
 If you are interested in contributing, please read our [CONTRIBUTING.md](CONTRIBUTING.md) file.
-
-:point_right: Keep the "Contributing" text above as the default NDCLab "blurb" to help visitors navigate the repo. But delete this note before publishing the readme file.
