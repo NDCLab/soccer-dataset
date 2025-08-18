@@ -6,3 +6,4 @@ derivatives/*
 sourcedata/
 data-monitoring/ndar/
 data-monitoring/*.out
+.Rproj.user

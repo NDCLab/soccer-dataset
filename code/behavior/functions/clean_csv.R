@@ -39,6 +39,7 @@ clean_csv <- function(subject_id) {
         flankerResponse.keys,
         flankerResponse.rt,
         ConfidenceRating,
+        ConfidenceRT, 
         confidencePrompt.started
       ) %>%
       
@@ -88,6 +89,8 @@ clean_csv <- function(subject_id) {
           TRUE ~ 7 - ConfidenceRating  # reverse scale for valid ratings
         ),
         
+        confidenceRating_rt = ConfidenceRT, 
+        
         # create trial code
         d1 = ifelse(block_condition == "social", 1, 2),
         d2 = ifelse(SMI == 0, 0, 1),
@@ -98,7 +101,7 @@ clean_csv <- function(subject_id) {
       ) %>%
       
       # remove intermediate columns and confidencePrompt.started
-      select(-d1, -d2, -rt_numeric, -confidencePrompt.started, -ConfidenceRating)
+      select(-d1, -d2, -rt_numeric, -confidencePrompt.started, -ConfidenceRating, -ConfidenceRT)
   })
   
   # write clean data

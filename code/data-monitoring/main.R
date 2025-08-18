@@ -1,0 +1,97 @@
+# ===================================================================
+# SocCEr Data Monitoring - Main Script
+# ===================================================================
+
+# load required libraries
+library(here)       # for robust file paths
+library(readr)      # for reading CSV files
+library(dplyr)      # for data manipulation
+
+# load configuration & functions
+source(here("config", "paths.R"))
+source(here("config", "settings.R"))
+source(here("functions", "check_eeg_files.R"))
+source(here("functions", "check_psychopy_files.R"))
+source(here("functions", "check_redcap_files.R"))
+source(here("functions", "check_digi_files.R"))
+source(here("functions", "copy_data.R"))
+source(here("functions", "tracker.R"))
+
+# main monitoring workflow
+cat("Starting SocCEr data monitoring...\n")
+
+# get configuration
+config <- get_data_monitoring_config()
+session <- get_session_config()$default_session
+filename_session <- get_session_config()$filename_session
+
+# create/check central tracker
+create_central_tracker()
+
+# get list of subjects to process
+all_subjects <- get_subject_list("eeg", session)
+subjects <- all_subjects[!all_subjects %in% config$skip_subjects]
+
+cat("Found", length(all_subjects), "total subjects,", length(subjects), "to process\n")
+if (length(config$skip_subjects) > 0) {
+  cat("Skipping:", paste(config$skip_subjects, collapse = ", "), "\n")
+}
+
+# process each subject
+for (subject_id in subjects) {
+  cat("Checking", subject_id, "...\n")
+  
+  # collect all issues for this subject
+  all_issues <- c()
+  
+  # run enabled checks & update tracker
+  if (config$check_eeg) {
+    eeg_issues <- check_eeg_files(subject_id, session, filename_session)
+    all_issues <- c(all_issues, eeg_issues)
+    # update tracker: 1 = present, 0 = missing/issues
+    update_tracker(subject_id, "eeg", if(length(eeg_issues) == 0) 1 else 0)
+  }
+  
+  if (config$check_psychopy) {
+    psychopy_issues <- check_psychopy_files(subject_id, session, filename_session)
+    all_issues <- c(all_issues, psychopy_issues)
+    
+    # separate practice and test status
+    practice_ok <- !any(grepl("practice", psychopy_issues))
+    test_ok <- !any(grepl("test", psychopy_issues))
+    update_tracker(subject_id, "psychopy_practice", if(practice_ok) 1 else 0)
+    update_tracker(subject_id, "psychopy_test", if(test_ok) 1 else 0)
+  }
+  
+  if (config$check_digi) {
+    digi_issues <- check_digi_files(subject_id, session, filename_session)
+    all_issues <- c(all_issues, digi_issues)
+    
+    # check if it's a no-data case
+    digi_path <- get_digi_file_path(subject_id, session)
+    no_data_file <- file.path(digi_path, "no-data.txt")
+    digi_status <- if(file.exists(no_data_file)) 2 else if(length(digi_issues) == 0) 1 else 0
+    update_tracker(subject_id, "digi", digi_status)
+  }
+  
+  if (config$check_redcap) {
+    redcap_issues <- check_redcap_files(subject_id, session, filename_session)
+    all_issues <- c(all_issues, redcap_issues)
+    update_tracker(subject_id, "redcap", if(length(redcap_issues) == 0) 1 else 0)
+  }
+  
+  # decide whether to copy
+  if (length(all_issues) == 0) {
+    cat("✓", subject_id, "passed all checks - copying data...\n")
+    copy_subject_data(subject_id, session, config)
+  } else {
+    cat("✗", subject_id, "has issues:\n")
+    for (issue in all_issues) {
+      cat("  -", issue, "\n")
+    }
+  }
+}
+
+# show final summary
+get_tracker_summary()
+cat("Data monitoring completed!\n")
