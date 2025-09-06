@@ -28,9 +28,18 @@ get_subject_test_csv <- function(subject_id) {
   file.path(data_path, subject_id, "test", csv_file)
 }
 
-# get path for clean output file
+# get path for clean output file (now mirrors eeg preprocessing structure)
 get_clean_output_path <- function(subject_id) {
-  data_path <- get_checked_data_path()
+  # create derivatives structure: analyses/derivatives/preprocessed/s1_r1/behavior/[subject]/
+  derivatives_dir <- file.path(get_dataset_root(), "analyses", "derivatives", "preprocessed", "s1_r1", "behavior", subject_id)
+  
+  # create directory if it doesn't exist
+  if (!dir.exists(derivatives_dir)) {
+    dir.create(derivatives_dir, recursive = TRUE)
+    cat("created directory:", derivatives_dir, "\n")
+  }
+  
+  # clean filename
   clean_file <- paste0(subject_id, "_soccer-test_psychopy_s1_r1_e1_clean.csv")
-  file.path(data_path, subject_id, "test", clean_file)
+  file.path(derivatives_dir, clean_file)
 }

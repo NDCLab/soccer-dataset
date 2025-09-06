@@ -58,6 +58,6 @@ get_data_monitoring_config <- function() {
     # sub-390018: only first condition of test-phase completed
     # sub-390019: only first condition of test-phase completed
     # sub-390022: under current preregistration inadmissable (5 trials missing from EEG data, see study tracker)
-    skip_subjects = c("sub-390022")
+    skip_subjects = c()
   )
 }

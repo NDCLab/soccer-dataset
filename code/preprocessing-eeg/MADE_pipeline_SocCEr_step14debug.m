@@ -96,13 +96,13 @@ addpath(genpath('C:/Matlab-Stuff'));% local: enter the path of the folder in thi
 %Location of EEGlab
 %addpath(genpath([main_dir filesep 'code' filesep 'eeglab13_4_4b']));% enter the path of the EEGLAB folder in this line
 % addpath(genpath('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standard/eeglab13_4_4b')); % HPC: enter the path of the EEGLAB folder in this line
-addpath(genpath('C:/Matlab-Stuff/eeglab13_4_4b_George')); % local: enter the path of the EEGLAB folder in this line
+addpath(genpath('C:/Matlab-Stuff/eeglab13_4_4b')); % local: enter the path of the EEGLAB folder in this line
 rmpath(genpath('C:/Matlab-Stuff/eeglab2023.1'));
 
 % remove path to octave functions inside matlab to prevent errors when
 % rmpath([main_dir filesep 'code' filesep 'eeglab13_4_4b' filesep 'functions' filesep 'octavefunc' filesep 'signal'])
 % rmpath(['/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standard/eeglab13_4_4b' filesep 'functions' filesep 'octavefunc' filesep 'signal'])
-rmpath(['C:/Matlab-Stuff/eeglab13_4_4b_George' filesep 'functions' filesep 'octavefunc' filesep 'signal'])
+rmpath(['C:/Matlab-Stuff/eeglab13_4_4b' filesep 'functions' filesep 'octavefunc' filesep 'signal'])
 
 addpath(fullfile(pwd, 'adjusted_adjust_scripts')); % add adjusted ADJUST scripts
 
@@ -229,8 +229,8 @@ output_format = 1; % 1 = .set (EEGLAB data structure), 2 = .mat (Matlab data str
 subjects_to_process = string(split(subjects, "/"));
 subjects_to_process = subjects_to_process(subjects_to_process~=""); %nvm not necessary
 subjects_to_process = strcat("sub-", subjects_to_process);
-% for file_locater_counter = 1:length(subjects_to_process) % This for loop lists the folders containing the main data files
-parfor file_locater_counter = 1:length(subjects_to_process) %1:4
+for file_locater_counter = 1:length(subjects_to_process) % This for loop lists the folders containing the main data files
+% parfor file_locater_counter = 1:length(subjects_to_process) %1:4
         try
         subjStart = tic;
         rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter));
@@ -255,7 +255,7 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
         % Enter the path of the folder where you want to save the processed data
     	% output_location = fullfile("/home/data/NDClab/dataset/soccer-dataset/analyses", "derivatives", "preprocessed", subjects_to_process(file_locater_counter), session, "eeg" );
         % output_location = fullfile("/home/data/NDClab/dataset/soccer-dataset/analyses", "derivatives", "preprocessed", session, "eeg", subjects_to_process(file_locater_counter)); % HPC
-        output_location = fullfile("C:/Users/localadmin/Documents/08_SocCEr/soccer-dataset", "derivatives", "preprocessed", session, "eeg", subjects_to_process(file_locater_counter)); % local
+        output_location = fullfile("C:/Users/localadmin/Documents/08_SocCEr/soccer-dataset/analyses", "derivatives", "preprocessed", session, "eeg", subjects_to_process(file_locater_counter)); % local
         % output_location = fullfile(main_dir, "derivatives", "preprocessed", subjects_to_process(file_locater_counter), session, "eeg" );
         % update the output_location
         output_location = char(output_location);
@@ -839,15 +839,15 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
             length_ica_data=EEG_copy.trials; % length of data (in second) fed into ICA
             EEG_copy = eeg_checkset(EEG_copy);
             % outcomment next line to skip ICA (out-comment following pop_saveset too and un-comment pop_loadset!) I Marlene 2025
-            EEG_copy = pop_runica(EEG_copy, 'icatype', 'runica', 'extended', 1, 'stop', 1E-7, 'interupt','off');
+            % EEG_copy = pop_runica(EEG_copy, 'icatype', 'runica', 'extended', 1, 'stop', 1E-7, 'interupt','off');
 
             % save data here for training purposes only (usually do not save here)
             % only doing this to allow for skipping the full run of ica
-            EEG_copy = pop_saveset(EEG_copy, 'filename', strrep(datafile_names{subject}, ext, '_ica_data_immediate.set'),'filepath', [output_location filesep 'ica_data' filesep ]); % save .set format
+            % EEG_copy = pop_saveset(EEG_copy, 'filename', strrep(datafile_names{subject}, ext, '_ica_data_immediate.set'),'filepath', [output_location filesep 'ica_data' filesep ]); % save .set format
 
             % load data here for training purposes only (usually do not save here)
             % only doing this to allow for skipping the full run of ica
-            % EEG_copy = pop_loadset( 'filename', strrep(datafile_names{subject}, ext, '_ica_data_immediate.set'), 'filepath', [output_location filesep 'ica_data' filesep]);
+            EEG_copy = pop_loadset( 'filename', strrep(datafile_names{subject}, ext, '_ica_data_immediate.set'), 'filepath', [output_location filesep 'ica_data' filesep]);
 
             % Find the ICA weights that would be transferred to the original dataset
             ICA_WINV=EEG_copy.icawinv;
@@ -966,7 +966,7 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                     
                     % integrate behavioral data after epoching
                     % load behavioral csv
-                    BEH = fullfile(main_dir, 'derivatives', 'preprocessed', session, 'behavior', subj, strcat(subj, '_soccer-test_psychopy_', sess, '_clean.csv'));
+                    BEH = fullfile(main_dir, 'sourcedata', 'checked', session, 'psychopy', subj, 'test', strcat(subj, '_soccer-test_psychopy_', sess, '_clean.csv'));
                     beh_file = BEH;
 
                     if exist(beh_file, 'file')
@@ -996,8 +996,15 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                 EEG = pop_rmbase( EEG, baseline_window);
             end
 
-
             %% STEP 14: Artifact rejection
+
+            % marlene 2025 I create debug folder for workspace saves
+            debug_folder = fullfile(pwd, 'DEBUG');
+            if ~exist(debug_folder, 'dir')
+                mkdir(debug_folder);
+                fprintf('created DEBUG folder: %s\n', debug_folder);
+            end
+
             all_bad_epochs=0;
             if voltthres_rejection==1 % check voltage threshold rejection
                 if interp_epoch==1 % check epoch level channel interpolation
@@ -1011,9 +1018,9 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                     badChans = zeros(EEG.nbchan, EEG.trials);
                     badepoch=zeros(1, EEG.trials);
                     if isempty(frontal_channels_idx)==1 % check whether there is any frontal channel in dataset to check
-                        warning('No frontal channels from the list present in the data. Only epoch interpolation will be performed.');
+                        warning('no frontal channels from the list present in the data. only epoch interpolation will be performed.');
                     else
-                        % find artifaceted epochs by detecting outlier voltage in the specified channels list and remove epoch if artifacted in those channels
+                        % find artifaceted epochs by detecting outlier voltage in the specified channels list & remove epoch if artifacted in those channels
                         for ch =1:length(frontal_channels_idx)
                             EEG = pop_eegthresh(EEG,1, frontal_channels_idx(ch), volt_threshold(1), volt_threshold(2), EEG.xmin, EEG.xmax,0,0);
                             EEG = eeg_checkset( EEG );
@@ -1026,10 +1033,10 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                         badepoch=logical(badepoch);
                     end
 
-                    % If all epochs are artifacted, save the dataset and ignore rest of the preprocessing for this subject.
+                    % if all epochs are artifacted, save the dataset & ignore rest of the preprocessing for this subject.
                     if sum(badepoch)==EEG.trials || sum(badepoch)+1==EEG.trials
                         all_bad_epochs=1;
-                        warning(['No usable data for datafile', datafile_names{subject}]);
+                        warning(['no usable data for datafile', datafile_names{subject}]);
                         if output_format==1
                             EEG = eeg_checkset(EEG);
                             EEG = pop_editset(EEG, 'setname',  strcat(subj,'_',task,'_no_usable_data_all_bad_epochs_',sess,desc));
@@ -1043,11 +1050,44 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                     end
 
                     if all_bad_epochs==1
-                        warning(['No usable data for datafile', datafile_names{subject}]);
+                        warning(['no usable data for datafile', datafile_names{subject}]);
                     else
-                        % Interpolate artifacted data for all reaming channels
+                        fprintf('debug: starting epoch interpolation with %d trials\n', EEG.trials);
+                        fprintf('debug: EEG data size: %s\n', mat2str(size(EEG.data)));
+
+                        % marlene 2025 I comprehensive debug setup for epoch interpolation
+                        fprintf('\n=== epoch interpolation debug start ===\n');
+                        fprintf('total epochs: %d\n', EEG.trials);
+                        fprintf('total channels: %d\n', EEG.nbchan);
+                        fprintf('frontal channels found: %s\n', mat2str(frontal_channels_idx));
+                        fprintf('badChans matrix size: %s\n', mat2str(size(badChans)));
+                        fprintf('total bad channel instances across all epochs: %d\n', sum(badChans(:)));
+                        
+                        % check for problematic epochs
+                        epochs_with_many_bad_chans = 0;
+                        for e = 1:EEG.trials
+                            bad_count = sum(badChans(:,e));
+                            if bad_count > EEG.nbchan * 0.5 % more than 50% bad
+                                fprintf('warning: epoch %d has %d/%d bad channels (%.1f%%)\n', e, bad_count, EEG.nbchan, 100*bad_count/EEG.nbchan);
+                                epochs_with_many_bad_chans = epochs_with_many_bad_chans + 1;
+                            end
+                        end
+                        fprintf('epochs with >50%% bad channels: %d\n', epochs_with_many_bad_chans);
+                        
+                        % pre-interpolation data validation
+                        fprintf('pre-interpolation validation:\n');
+                        fprintf('  EEG structure type: %s\n', class(EEG));
+                        fprintf('  channel locations present: %s\n', mat2str(~isempty(EEG.chanlocs)));
+                        fprintf('  number of channel locations: %d\n', length(EEG.chanlocs));
+                        if ~isempty(EEG.chanlocs)
+                            fprintf('  sample channel labels: %s\n', strjoin({EEG.chanlocs(1:min(3,end)).labels}, ', '));
+                        end
+                        fprintf('================================\n\n');
+                        % marlene 2025 I debug setup end
+
+                        % interpolate artifacted data for all remaining channels
                         badChans = zeros(EEG.nbchan, EEG.trials);
-                        % Find artifacted epochs by detecting outlier voltage but don't remove
+                        % find artifacted epochs by detecting outlier voltage but don't remove
                         for ch=1:EEG.nbchan
                             EEG = pop_eegthresh(EEG,1, ch, volt_threshold(1), volt_threshold(2), EEG.xmin, EEG.xmax,0,0);
                             EEG = eeg_checkset(EEG);
@@ -1055,18 +1095,176 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                             badChans(ch,:) = EEG.reject.rejglobal;
                         end
                         tmpData = zeros(EEG.nbchan, EEG.pnts, EEG.trials);
+
+                        % marlene 2025 I outcommented original problematic loop for debugging
+                        % for e = 1:EEG.trials
+                        %     if mod(e, 10) == 1  % print every 10th epoch
+                        %         fprintf('debug: processing epoch %d/%d\n', e, EEG.trials);
+                        %     end
+                        %     % initialize variables EEGe & EEGe_interp;
+                        %     EEGe = []; EEGe_interp = []; badChanNum = [];
+                        %     % select only this epoch (e)
+                        %     EEGe = pop_selectevent( EEG, 'epoch', e, 'deleteevents', 'off', 'deleteepochs', 'on', 'invertepochs', 'off');
+                        %     badChanNum = find(badChans(:,e)==1); % find which channels are bad for this epoch
+                        %     EEGe_interp = eeg_interp(EEGe,badChanNum); %interpolate the bad channels for this epoch
+                        %     tmpData(:,:,e) = EEGe_interp.data; % store interpolated data into matrix
+                        % end
+                        % marlene 2025 I end outcommented original section
+
+                        % marlene 2025 I replacement debugging loop start
+                        error_count = 0;
+                        max_errors_before_abort = 5; % stop after 5 errors to prevent endless debugging
+                        
                         for e = 1:EEG.trials
-                            % Initialize variables EEGe and EEGe_interp;
-                            EEGe = []; EEGe_interp = []; badChanNum = [];
-                            % Select only this epoch (e)
-                            EEGe = pop_selectevent( EEG, 'epoch', e, 'deleteevents', 'off', 'deleteepochs', 'on', 'invertepochs', 'off');
-                            badChanNum = find(badChans(:,e)==1); % find which channels are bad for this epoch
-                            EEGe_interp = eeg_interp(EEGe,badChanNum); %interpolate the bad channels for this epoch
-                            tmpData(:,:,e) = EEGe_interp.data; % store interpolated data into matrix
+                            try
+                                if mod(e, 50) == 1  % print every 50th epoch
+                                    fprintf('processing epoch %d/%d\n', e, EEG.trials);
+                                end
+
+                                EEGe = []; EEGe_interp = []; badChanNum = [];
+                                
+                                % marlene 2025 I debug: validate epoch selection
+                                EEGe = pop_selectevent(EEG, 'epoch', e, 'deleteevents', 'off', 'deleteepochs', 'on', 'invertepochs', 'off');
+                                
+                                % critical validation after epoch selection
+                                if ~isstruct(EEGe) || isempty(EEGe)
+                                    error('epoch selection failed: EEGe is not a valid EEG struct');
+                                end
+                                
+                                if ~isfield(EEGe, 'chanlocs') || isempty(EEGe.chanlocs)
+                                    error('epoch selection failed: EEGe missing channel locations');
+                                end
+                                
+                                if size(EEGe.data, 1) ~= length(EEGe.chanlocs)
+                                    error('epoch selection failed: data channels (%d) != chanlocs (%d)', size(EEGe.data, 1), length(EEGe.chanlocs));
+                                end
+                                
+                                badChanNum = find(badChans(:,e)==1);
+
+                                % detailed logging for problematic epochs or near known failure points
+                                if length(badChanNum) > EEG.nbchan * 0.3 || e >= 310 || error_count > 0 % log if many bad channels, near failure point, or after errors
+                                    fprintf('epoch %d: %d bad channels: %s\n', e, length(badChanNum), mat2str(badChanNum));
+                                    fprintf('  EEGe channels: %d, data size: %s\n', EEGe.nbchan, mat2str(size(EEGe.data)));
+                                    fprintf('  EEGe has %d channel locations\n', length(EEGe.chanlocs));
+                                    if ~isempty(badChanNum) && max(badChanNum) <= length(EEGe.chanlocs)
+                                        fprintf('  bad channel labels: %s\n', strjoin({EEGe.chanlocs(badChanNum).labels}, ', '));
+                                    end
+                                end
+
+                                % marlene 2025 I comprehensive pre-interpolation validation
+                                if ~isempty(badChanNum)
+                                    % check that all bad channel indices are valid
+                                    if any(badChanNum < 1) || any(badChanNum > EEGe.nbchan)
+                                        error('invalid bad channel indices: %s (valid range: 1-%d)', mat2str(badChanNum), EEGe.nbchan);
+                                    end
+                                    
+                                    % check that channel locations exist for bad channels
+                                    if length(EEGe.chanlocs) < max(badChanNum)
+                                        error('insufficient channel locations: need %d, have %d', max(badChanNum), length(EEGe.chanlocs));
+                                    end
+                                    
+                                    % leave in for debug, take out for parfor loop
+                                    % % save workspace before interpolation for critical epochs
+                                    if e == 317 || (error_count > 0 && mod(e, 10) == 0)
+                                        save_file = fullfile(debug_folder, sprintf('debug_before_interp_epoch_%d.mat', e));
+                                        fprintf('saving debug workspace: %s\n', save_file);
+                                        save(save_file, 'EEGe', 'badChanNum', 'e', 'EEG');
+                                    end
+                                end
+                                
+                                % marlene 2025 I diagnostic before interpolation
+                                if e >= 310 || error_count > 0 % extra logging near known failure point or after errors
+                                    fprintf('epoch %d - before interp: EEGe has %d channels, badChanNum = %s\n', e, EEGe.nbchan, mat2str(badChanNum));
+                                    if ~isempty(badChanNum) && max(badChanNum) <= length(EEGe.chanlocs)
+                                        fprintf('bad channel labels: %s\n', strjoin({EEGe.chanlocs(badChanNum).labels}, ', '));
+                                    end
+                                    
+                                    % verify EEG struct integrity before calling eeg_interp
+                                    fprintf('EEGe validation:\n');
+                                    fprintf('  data dimensions: %s\n', mat2str(size(EEGe.data)));
+                                    fprintf('  nbchan: %d\n', EEGe.nbchan);
+                                    fprintf('  chanlocs length: %d\n', length(EEGe.chanlocs));
+                                    fprintf('  trials: %d\n', EEGe.trials);
+                                end
+                                
+                                % marlene 2025 I critical: ensure we have the right function call
+                                % the original error shows eeg_interp is expecting a full EEG struct, not raw data
+                                if ~isempty(badChanNum)
+                                    % verify this is a proper EEG struct before calling eeg_interp
+                                    required_fields = {'data', 'chanlocs', 'nbchan', 'srate', 'trials'};
+                                    for rf = 1:length(required_fields)
+                                        if ~isfield(EEGe, required_fields{rf})
+                                            error('EEGe missing required field: %s', required_fields{rf});
+                                        end
+                                    end
+                                    
+                                    EEGe_interp = eeg_interp(EEGe, badChanNum);
+                                else
+                                    EEGe_interp = EEGe; % no interpolation needed
+                                end
+
+                                % diagnostic after interpolation
+                                if e >= 310 || error_count > 0 % extra logging near known failure point or after errors
+                                    fprintf('after interp: EEGe_interp has %d channels\n', EEGe_interp.nbchan);
+                                    if EEGe_interp.nbchan ~= EEGe.nbchan
+                                        error('channel count changed! expected %d, got %d', EEGe.nbchan, EEGe_interp.nbchan);
+                                    end
+                                    if size(EEGe_interp.data, 1) ~= EEG.nbchan
+                                        error('interpolated data has wrong channel count: expected %d, got %d', EEG.nbchan, size(EEGe_interp.data, 1));
+                                    end
+                                    fprintf('interpolation successful for epoch %d\n', e);
+                                end
+                                % marlene 2025 I diagnostic end
+                                
+                                tmpData(:,:,e) = EEGe_interp.data;
+
+                            catch ME
+                                error_count = error_count + 1;
+                                fprintf('\n!!! error at epoch %d (error #%d) !!!\n', e, error_count);
+                                fprintf('  message: %s\n', ME.message);
+                                fprintf('  identifier: %s\n', ME.identifier);
+                                fprintf('  bad channels: %s (%d total)\n', mat2str(badChanNum), length(badChanNum));
+                                
+                                % detailed error diagnostics
+                                try
+                                    fprintf('  EEGe type: %s\n', class(EEGe));
+                                    if isstruct(EEGe)
+                                        fprintf('  EEGe channels: %d\n', EEGe.nbchan);
+                                        fprintf('  EEGe data size: %s\n', mat2str(size(EEGe.data)));
+                                        fprintf('  EEGe chanlocs count: %d\n', length(EEGe.chanlocs));
+                                    end
+                                catch debug_error
+                                    fprintf('  could not get EEGe diagnostics: %s\n', debug_error.message);
+                                end
+                                
+                                % leave in for debug, take out for parfor loop
+                                % % save comprehensive error workspace
+                                error_file = fullfile(debug_folder, sprintf('debug_epoch_%d_error_%d.mat', e, error_count));
+                                fprintf('saving error workspace: %s\n', error_file);
+                                try
+                                    save(error_file, 'EEGe', 'badChanNum', 'e', 'ME', 'EEG', 'badChans');
+                                catch save_error
+                                    fprintf('could not save error workspace: %s\n', save_error.message);
+                                end
+                                
+                                % abort after too many errors to prevent endless debugging
+                                if error_count >= max_errors_before_abort
+                                    fprintf('aborting after %d errors to prevent endless debugging\n', error_count);
+                                    fprintf('check saved .mat files for detailed error analysis\n');
+                                    rethrow(ME);
+                                end
+                                
+                                % for debugging purposes, skip this epoch & continue
+                                fprintf('skipping epoch %d due to error, using original data\n', e);
+                                tmpData(:,:,e) = EEG.data(:,:,e); % use original uninterpolated data
+                            end
                         end
+                        % marlene 2025 I replacement debugging loop end
+
+                        fprintf('epoch interpolation completed with %d errors\n', error_count);
                         EEG.data = tmpData; % now that all of the epochs have been interpolated, write the data back to the main file
 
-                        % If more than 10% of channels in an epoch were interpolated, reject that epoch
+                        % if more than 10% of channels in an epoch were interpolated, reject that epoch
                         badepoch=zeros(1, EEG.trials);
                         for ei=1:EEG.trials
                             NumbadChan = badChans(:,ei); % find how many channels are bad in an epoch
@@ -1076,10 +1274,10 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                         end
                         badepoch=logical(badepoch);
                     end
-                    % If all epochs are artifacted, save the dataset and ignore rest of the preprocessing for this subject.
+                    % if all epochs are artifacted, save the dataset & ignore rest of the preprocessing for this subject.
                     if sum(badepoch)==EEG.trials || sum(badepoch)+1==EEG.trials
                         all_bad_epochs=1;
-                        warning(['No usable data for datafile', datafile_names{subject}]);
+                        warning(['no usable data for datafile', datafile_names{subject}]);
                         if output_format==1
                             EEG = eeg_checkset(EEG);
                             EEG = pop_editset(EEG, 'setname',  strcat(subj,'_',task,'_no_usable_data_all_bad_epochs_',sess,desc));
@@ -1097,10 +1295,10 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                     EEG = eeg_rejsuperpose( EEG, 1, 1, 1, 1, 1, 1, 1, 1);
                 end % end of epoch level channel interpolation if statement
 
-                % If all epochs are artifacted, save the dataset and ignore rest of the preprocessing for this subject.
+                % if all epochs are artifacted, save the dataset & ignore rest of the preprocessing for this subject.
                 if sum(EEG.reject.rejthresh)==EEG.trials || sum(EEG.reject.rejthresh)+1==EEG.trials
                     all_bad_epochs=1;
-                    warning(['No usable data for datafile', datafile_names{subject}]);
+                    warning(['no usable data for datafile', datafile_names{subject}]);
                     if output_format==1
                         EEG = eeg_checkset(EEG);
                         EEG = pop_editset(EEG, 'setname',  strcat(subj,'_',task,'_no_usable_data_all_bad_epochs_',sess,desc));
@@ -1137,7 +1335,6 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                 total_epochs_after_artifact_rejection=EEG.trials;
             end
 
-
             %% STEP 15: Interpolate deleted channels
             if interp_channels==1
                 EEG = eeg_interp(EEG, channels_analysed);
@@ -1148,6 +1345,19 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
             else
                 total_channels_interpolated=numel(FASTbadChans)+ numel(ica_prep_badChans);
             end
+
+            % marlene 2025 - clear orphaned ICA fields after interpolation to prevent dialogs
+            if isfield(EEG, 'icaweights') && ~isempty(EEG.icaweights)
+                EEG.icaweights = [];
+                EEG.icasphere = [];
+                EEG.icawinv = [];
+                EEG.icachansind = [];
+                fprintf('cleared ICA information due to channel count mismatch\n');
+            else
+                % clear icachansind even if no other ICA fields exist
+                EEG.icachansind = [];
+            end
+            EEG = eeg_checkset(EEG, 'ica');
 
 
             %% STEP 16: Rereference data
