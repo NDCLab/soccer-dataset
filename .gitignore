@@ -7,3 +7,12 @@ sourcedata/
 data-monitoring/ndar/
 data-monitoring/*.out
 .Rproj.user
+
+# MATLAB autosave files
+*.asv
+
+# R history files
+.Rhistory
+
+# Temporary files
+*.tmp
