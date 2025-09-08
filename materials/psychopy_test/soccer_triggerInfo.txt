@@ -1,0 +1,82 @@
+# SocCEr Test Experiment - Trigger Values
+
+# legend: 
+sent         | displayed    | explanation
+
+## Block Setup Triggers (blockSetup routine)
+# CB Index
+50-61        | 50-61        | Counterbalancing index (cb_index + 49)
+
+# Key Mappings  
+70-72        | 70-72        | PW key mapping (s=70, d=71, f=72)
+80-82        | 80-82        | MV key mapping (s=80, d=81, f=82)
+90-92        | 90-92        | BR key mapping (s=90, d=91, f=92)
+
+# Block Condition
+96           | 96           | Social condition
+97           | 97           | Non-social condition
+
+## Trial Event Triggers (fixation routine)
+1            | 1            | Fixation cross onset 			**TIMING-CRITICAL: trial start marker**
+112          | 112          | Target visible (SMI > 0)
+113          | 113          | Target invisible (SMI = 0)
+144-149      | 16-21        | Target letter (P=16, W=17, M=18, V=19, B=20, R=21)
+160-165      | 32-37        | Flanker letter (P=32, W=33, M=34, V=35, B=36, R=37)
+
+## Stimulus Event Triggers (flankerTask routine)
+2            | 2            | Stimulus array onset 		**TIMING-CRITICAL: stimulus onset marker**
+4            | 4            | Mask onset (at SMI frame) **TIMING-CRITICAL: mask onset marker**
+
+# Key Response Triggers
+40           | 40           | S key pressed 	**TIMING-CRITICAL: response onset marker**
+41           | 41           | D key pressed 	**TIMING-CRITICAL: response onset marker**
+42           | 42           | F key pressed 	**TIMING-CRITICAL: response onset marker**
+
+# Response Classification Triggers
+135          | 7            | visible-target condition: correct response (corr)
+136          | 8            | visible-target condition: flanker error (FE)
+137          | 9            | invisible-target condition: flanker error (FE)
+138          | 10           | visible-target condition: non-flanker error (NFE)
+139          | 11           | invisible-target condition: non-flanker guess (NFG)
+140          | 12           | multiple key responses
+141          | 13           | backup trigger (logic failure)
+
+# Other Event Triggers
+133          | 5            | Too slow (deadline exceeded) 		**TIMING-CRITICAL: deadline marker**
+64           | 64           | Confidence prompt shown 			**TIMING-CRITICAL: confidence onset marker**
+127          | 127          | Confidence response submitted 	**TIMING-CRITICAL: confidence response marker**
+134          | 6            | Block feedback displayed 			**TIMING-CRITICAL: feedback onset marker**
+
+## EEG TRIGGER RANGES (final received values):
+- Timing events: 1, 2, 4, 5, 6
+- Response classification: 7-13
+- Target letters: 16-21
+- Flanker letters: 32-37
+- Key responses: 40-42
+- Block setup: 50-61, 64, 70-72, 80-82, 90-92, 96-97
+- Confidence: 64, 127
+- Visibility: 112-113
+
+## NOT CODED BY TRIGGER: 
+- Confidence Rating
+- Block Type (practice vs. test, but practice blocks are not preceded by social condition marker 96/97)
+
+### Trial Structure Events
+- ITI start/end - no markers for inter-trial interval boundaries
+- Trial end - no explicit trial completion marker
+- Routine transitions - no markers when moving between routines
+
+### Stimulus Presentation Details
+- Target offset - only onset (trigger 2) but no target disappearance marker
+- Flanker offset - flankers disappear when keypress detected but no separate trigger
+- Mask offset - only onset (trigger 4) but no mask disappearance marker
+- Stimulus disappearance on keypress - stimuli vanish when response made but no separate trigger
+
+### Response Window Events
+- Multiple keypress events - only first keypress logged (triggers 40-42), subsequent presses ignored
+- Key release timing - only key press onset, not release
+
+### Confidence Rating Details
+- Confidence rating value - actual slider position not triggered
+- Slider movement/interaction - mouse movements on slider not logged
+- Confidence prompt offset - when prompt disappears
