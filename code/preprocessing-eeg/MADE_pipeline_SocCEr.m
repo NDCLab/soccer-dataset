@@ -839,15 +839,15 @@ for file_locater_counter = 1:length(subjects_to_process) % This for loop lists t
             length_ica_data=EEG_copy.trials; % length of data (in second) fed into ICA
             EEG_copy = eeg_checkset(EEG_copy);
             % outcomment next line to skip ICA (out-comment following pop_saveset too and un-comment pop_loadset!) I Marlene 2025
-            % EEG_copy = pop_runica(EEG_copy, 'icatype', 'runica', 'extended', 1, 'stop', 1E-7, 'interupt','off');
+            EEG_copy = pop_runica(EEG_copy, 'icatype', 'runica', 'extended', 1, 'stop', 1E-7, 'interupt','off');
 
             % save data here for training purposes only (usually do not save here)
             % only doing this to allow for skipping the full run of ica
-            % EEG_copy = pop_saveset(EEG_copy, 'filename', strrep(datafile_names{subject}, ext, '_ica_data_immediate.set'),'filepath', [output_location filesep 'ica_data' filesep ]); % save .set format
+            EEG_copy = pop_saveset(EEG_copy, 'filename', strrep(datafile_names{subject}, ext, '_ica_data_immediate.set'),'filepath', [output_location filesep 'ica_data' filesep ]); % save .set format
 
             % load data here for training purposes only (usually do not save here)
             % only doing this to allow for skipping the full run of ica
-            EEG_copy = pop_loadset( 'filename', strrep(datafile_names{subject}, ext, '_ica_data_immediate.set'), 'filepath', [output_location filesep 'ica_data' filesep]);
+            % EEG_copy = pop_loadset( 'filename', strrep(datafile_names{subject}, ext, '_ica_data_immediate.set'), 'filepath', [output_location filesep 'ica_data' filesep]);
 
             % Find the ICA weights that would be transferred to the original dataset
             ICA_WINV=EEG_copy.icawinv;
